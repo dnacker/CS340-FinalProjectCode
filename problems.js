@@ -156,7 +156,6 @@ module.exports = function() {
     });
 
     router.put('/:id', function(req, res) {
-        //TODO: update function so that pid, sid pairs are deleted or added as appropriate
         var mysql = req.app.get('mysql');
         var sql = "UPDATE problems SET name=?, difficulty=?, zoneid=? WHERE id=?";
         var inserts = [req.body.name, req.body.difficulty, req.body.zoneid, req.params.id];
@@ -173,7 +172,7 @@ module.exports = function() {
 
     router.delete('/:id', function(req, res) {
         var mysql = req.app.get('mysql');
-        var sql = "DELETE FROM problems WHERE id = ?";
+        var sql = "CALL delete_problem(?)";
         var inserts = [req.params.id];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {

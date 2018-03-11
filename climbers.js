@@ -37,53 +37,6 @@ module.exports = function() {
         });
     }
 
-    function deleteClimber(req, res, mysql) {
-        var sql = "DELETE FROM climbers WHERE id = ?";
-        var inserts = [req.params.id];
-        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
-            if (error) {
-                res.write(JSON.stringify(error));
-                res.status(400);
-                res.end();
-            } else {
-                res.status(202);
-                res.end();
-            }
-        });
-    }
-
-    function decrementAllProblems(req, res, mysql) {
-        var sql = "SELECT problems.id FROM problems " +
-                "INNER JOIN ascents ON problems.id = ascents.pid " +
-                "INNER JOIN climbers ON climbers.id = ascents.cid " +
-                "WHERE climbers.id = ?";
-        var inserts = [req.params.id];
-        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
-            if (error) {
-                res.write(JSON.stringify(error));
-                res.status(400);
-                res.end();
-            } else {
-                for (var i = 0; i < results.length; i++) {
-                    decrementProblem(res, results[i], mysql);
-                }
-                deleteClimber(req, res, mysql);
-            }
-        });
-    }
-
-    function decrementProblem(res, pid, mysql) {
-        var sql = "UPDATE problems SET problems.ascents = problems.ascents - 1 WHERE problems.id = ?";
-        var inserts = [pid];
-        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
-            if (error) {
-                res.write(JSON.stringify(error));
-                res.status(400);
-                res.end();
-            }
-        });
-    }
-
     router.get('/', function(req, res) {
         var callbackCount = 0;
         var context = {};
@@ -145,7 +98,17 @@ module.exports = function() {
 
     router.delete('/:id', function(req, res) {
         var mysql = req.app.get('mysql');
-        decrementAllProblems(req, res, mysql);
+        var sql = "CALL delete_climber(?)"
+        var inserts = req.params.id;
+        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
+            if (error) {
+                res.write(JSON.stringify(error));
+                res.end();
+            } else {
+                res.status(202);
+                res.end();
+            }
+        });
     });
 
 
