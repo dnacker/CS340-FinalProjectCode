@@ -1,0 +1,15 @@
+<h1>Update {{problem.name}}</h1>
+<form id="update-problem" action="/problems" method="post">
+    Name: <input type="text" name="name" value="{{problem.name}}"><br>
+    Difficulty: <input type="number" name="difficulty" value="{{problem.difficulty}}"><br>
+    Styles: 
+    {{#each styles}}
+    {{name}}: <input type="checkbox" value="{{id}}" name="styles"><br>
+    {{/each}}
+    Zone: <select name="zoneid">
+        {{#each zones}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+</form>
+<button onclick="updateProblem({{problem.id}})">Update</button>

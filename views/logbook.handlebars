@@ -1,0 +1,46 @@
+<h1>{{climber.name}}'s Logbook</h1>
+<h2>Problems</h2>
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Difficulty</th>
+        <th>Zone</th>
+    </thead>
+    {{#each problems}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{difficulty}}</td>
+            <td>{{zone}}</td>
+            <td><button onclick="deleteAscent({{../climber.id}},{{id}})">Delete</button></td>
+        </tr>
+    {{/each}}
+</table>
+<h2>
+    Log Ascent
+</h2>
+<form id="display-problems" action="/logbook/{{climber.id}}/" method="GET">
+    Zone: <select name="zone">
+    {{#each zones}}
+    <option value="{{id}}">{{name}}</option>
+    {{/each}}
+    </select><br>
+    <input type="submit" value="Show Problems">
+</form>
+<h2>{{zone}}</h2>
+<form id="add-ascents" action="/logbook/{{climber.id}}/" method="POST">
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Difficulty</th>
+        <th>Completed</th>
+    </thead>
+    {{#each zoneproblems}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{difficulty}}</td>
+            <td><input type="checkbox" value="{{id}}" name="zoneproblems"> </td>
+        </tr>
+    {{/each}}
+</table>
+<input type="submit" value="Add Ascents">
+</form>

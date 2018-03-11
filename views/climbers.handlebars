@@ -1,0 +1,38 @@
+<h1>Current Climbers:</h1>
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Height</th>
+        <th>Weight</th>
+        <th>Ascents</th>
+        <th>Home Zone</th>
+    </thead>
+    <tbody>
+        {{#each climbers}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{age}}</td>
+            <td>{{height}}</td>
+            <td>{{weight}}</td>
+            <td>{{ascents}}</td>
+            <td>{{homezone}}</td>
+            <td><button onclick="deleteClimber({{id}})">Delete</button></td>
+            <td><a href="/climbers/{{id}}">Update</a></td>
+            <td><a href="/logbook/{{id}}">Logbook</a></td>
+        </tr>
+        {{/each}}
+    </tbody>
+    <form id="addclimber" action="/climbers" method="post">
+    Name: <input type="text" name="name"><br>
+    Age: <input type="number" name="age"><br>
+    Height (cm): <input type="number" name="height"><br>
+    Weight (kg): <input type="number" name="weight"><br>
+    Home Zone: <select name="homezone">
+        {{#each zones}}
+        <option value="{{id}}">{{name}}</option>
+        {{/each}}
+    </select><br>
+    <input type="submit" value="Submit">
+    </form>
+</table>
