@@ -20,7 +20,7 @@ module.exports = function() {
                     "INNER JOIN climbers ON ascents.cid = climbers.id " +
                     "INNER JOIN problems ON ascents.pid = problems.id " +
                     "INNER JOIN zones ON problems.zoneid = zones.id " +
-                    "WHERE climbers.id = ?";
+                    "WHERE climbers.id = ? ORDER BY problems.difficulty";
         var inserts = [cid];
         mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
@@ -45,7 +45,8 @@ module.exports = function() {
 
     function getZoneProblems(res, mysql, context, zid, complete) {
         var sql = "SELECT problems.id, problems.name, problems.difficulty, zones.name as zone FROM problems " + 
-                    "INNER JOIN zones ON problems.zoneid = zones.id WHERE zones.id = ?";
+                    "INNER JOIN zones ON problems.zoneid = zones.id " + 
+                    "WHERE zones.id = ? ORDER BY problems.difficulty";
         var inserts = [zid];
         mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
@@ -76,7 +77,6 @@ module.exports = function() {
         function complete() {
             callbackCount++;
             if (callbackCount >= 4) {
-                // console.log(context);
                 res.render('logbook', context);
             }
         }

@@ -15,6 +15,8 @@ app.set('mysql', mysql);
 app.use('/climbers', require('./climbers.js'));
 app.use('/problems', require('./problems.js'));
 app.use('/logbook', require('./logbook.js'));
+app.use('/zones', require('./zones.js'));
+app.use('/home', require('./home.js'));
 
 app.use(function(req,res) {
     res.status(404);

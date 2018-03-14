@@ -34,3 +34,8 @@ nav li a:hover {
 .active {
     background-color: #1565c0;
 }
+
+header a {
+    text-decoration: none;
+    color: #111;
+}

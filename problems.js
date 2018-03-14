@@ -3,7 +3,10 @@ module.exports = function() {
     var router = express.Router();
 
     function getProblems(res, mysql, context, complete) {
-        mysql.pool.query("SELECT problems.id, problems.name, difficulty, ascents, zones.name AS zone FROM problems INNER JOIN zones ON problems.zoneid = zones.id", function(error, results, fields) {
+        var sql = "SELECT problems.id, problems.name, difficulty, ascents, zones.name AS zone FROM problems " + 
+                "INNER JOIN zones ON problems.zoneid = zones.id " + 
+                "ORDER BY zone, difficulty";
+        mysql.pool.query(sql, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
                 res.end();
@@ -95,6 +98,7 @@ module.exports = function() {
     });
 
     router.post('/', function(req, res) {
+        //fix post
         callbackCount = 0;
         var mysql = req.app.get('mysql');
         var sql1 = "INSERT INTO problems (name, difficulty, ascents, zoneid) VALUES (?, ?, ?, ?)";
@@ -119,16 +123,26 @@ module.exports = function() {
                         res.write(JSON.stringify(error));
                         res.end();
                     } else {
+                        var sql3 = "UPDATE zones SET zones.quantity = zones.quantity + 1 " +
+                                "WHERE zones.id = ?";
+                        var inserts3 = [req.body.zone];
+                        sql3 = mysql.pool.query(sql3, inserts3, function(error, results, fields) {
+                            if (error) {
+                                res.write(JSON.stringify(error));
+                                res.end();
+                            } else {
+                                complete();
+                            }
+                        });
                         complete();
                     }
                 });
             }
             complete();
         });
-
         function complete() {
             callbackCount++;
-            if (callbackCount>= 2) {
+            if (callbackCount>= 3) {
                 res.redirect('/problems');
             }
         }
@@ -149,7 +163,7 @@ module.exports = function() {
 
         function complete() {
             callbackCount++;
-            if (callbackCount >= 3) {
+            if (callbackCount >= 4) {
                 res.render('update-problem', context);
             }
         }
@@ -159,6 +173,7 @@ module.exports = function() {
         var mysql = req.app.get('mysql');
         var sql = "UPDATE problems SET name=?, difficulty=?, zoneid=? WHERE id=?";
         var inserts = [req.body.name, req.body.difficulty, req.body.zoneid, req.params.id];
+        //TODO: update from checkboxes so styles are updated
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 req.write(JSON.stringify(error));

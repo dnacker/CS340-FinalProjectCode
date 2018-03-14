@@ -1,0 +1,26 @@
+<h1>{{zone.name}}</h1>
+<form id="update-zone" action="/zones" method="post">
+    Name: <input type="text" name="name" value="{{zone.name}}"><br>
+    Country: <input type="text" name="country" value="{{zone.country}}"><br>
+    State/Province: <input type="text" name="state" value="{{zone.state}}"><br>
+</form>
+<button onclick="updateZone({{zone.id}})">Update</button>
+
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Difficulty</th>
+        <th>Ascents</th>
+    </thead>
+    <tbody>
+        {{#each problems}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{difficulty}}</td>
+            <td>{{ascents}}</td>
+            <td><a href="/problems/{{id}}">Update</a></td>
+            <td><button onclick="deleteProblem({{id}})">Delete</button></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

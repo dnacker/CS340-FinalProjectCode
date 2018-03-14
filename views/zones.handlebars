@@ -1,0 +1,28 @@
+<h1>Zones</h1>
+<table>
+    <thead>
+        <th>Name</th>
+        <th>Country</th>
+        <th>State/Province</th>
+        <th>Quantity</th>
+    </thead>
+    <tbody>
+        {{#each zones}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{country}}</td>
+            <td>{{state}}</td>
+            <td>{{quantity}}</td>
+            <td><a href="/zones/{{id}}">Update</a></td>
+            <td><button onclick="deleteZone({{id}})">Delete</button></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<h2>Add a zone:</h2>
+<form id="addzone" action="/zones" method="post">
+    Name: <input type="text" name="name"><br>
+    Country: <input type="text" name="country"><br>
+    State: <input type="text" name="state"><br>
+    <input type="submit" value="Submit">
+</form>

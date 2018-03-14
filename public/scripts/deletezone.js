@@ -1,12 +1,12 @@
 $(document).ready(function() {
-    $("#problems-link").addClass("active");
+    $("#zones-link").addClass("active");
 });
 
-function deleteProblem(id) {
-    var confirmDelete = confirm("Are you sure you want to delete this problem?");
+function deleteZone(id) {
+    var confirmDelete = confirm("Are you sure you want to delete this zone?");
     if (confirmDelete) {
         $.ajax({
-            url: '/problems/' + id,
+            url: '/zones/' + id,
             type: 'DELETE',
             success: function(result) {
                 window.location.reload(true);

@@ -1,4 +1,4 @@
-<h1>Current Problems:</h1>
+<h1>Problems</h1>
 <table>
     <thead>
         <th>Name</th>
@@ -19,12 +19,14 @@
                 {{/each}}
             </td>
             <td>{{zone}}</td>
-            <td><button onclick="deleteProblem({{id}})">Delete</button></td>
             <td><a href="/problems/{{id}}">Update</a></td>
+            <td><button onclick="deleteProblem({{id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
-    <form id="addproblem" action="/problems" method="post">
+</table>
+<h2>Add a problem:</h2>
+<form id="addproblem" action="/problems" method="post">
     Name: <input type="text" name="name"><br>
     Difficulty: <input type="number" name="difficulty"><br>
     Styles: 
@@ -37,5 +39,4 @@
         {{/each}}
     </select><br>
     <input type="submit" value="Submit">
-    </form>
-</table>
+</form>

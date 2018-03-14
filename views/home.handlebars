@@ -1,0 +1,45 @@
+<h1>What is this database?</h1>
+<h2>Definitions</h2>
+<p>
+    There are 5 main entities in this database:
+    <ul>
+        <li>Zone</li>
+        <li>Problem</li>
+        <li>Style</li>
+        <li>Climber</li>
+        <li>Ascent</li>
+        
+    </ul>
+</p>
+<h2>Description of entities:</h2>
+<h3>Zone</h3>
+<p>
+    In rock climbing, there is a discipline known as bouldering. Boulders tend to fall off cliff bands in bunches.
+    A bunch of boulders constitutes a zone. A zone is typically named after a town or geographic feature it is near.
+    For example, near the town of Leavenworth in Washington there is a zone called "Leavenworth" that has many boulders.
+    Zones have a name, country, state and quantity of climbs.
+</p>
+<h3>Problem</h3>
+<p>
+    Each boulder has several paths to climb it, typically called problems. A problem has a difficulty (0 - 16), a zone that it is in,
+    a list of styles that it is and the number of ascents that it has seen. Problems with many ascents tend to be popular
+    problems since many people have climbed them.
+</p>
+<h3>Style</h3>
+<p>
+    Problems come in different styles. A problem may have multiple styles so this is kept track in a many-to-many table.
+    Styles denote how the boulder might suit a particular climber. Some climbers have an easier time with powerful problems,
+    while other climbers may have easier times with technical problems.
+</p>
+<h3>Climber</h3>
+<p>
+    The practitioners of bouldering are called climbers. They will use this database to log their climbing ascents.
+    They have some identifying information like name, age, height and weight and then a local zone they call home.
+</p>
+<h3>Ascent</h3>
+<p>
+    Whenever a climber accomplishes a problem, this is known as an ascent. A climber can keep track of their progress in a logbook
+    which details all the climbs they have sent. Some thoughts on extending this are to have this keep track of the date
+    of the ascent as well as comments the climber has to say about the climb. Adding an ascent will increase both the number of ascents
+    for that climber and the number of ascents the problem has seen.
+</p>
