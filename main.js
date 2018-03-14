@@ -16,7 +16,6 @@ app.use('/climbers', require('./climbers.js'));
 app.use('/problems', require('./problems.js'));
 app.use('/logbook', require('./logbook.js'));
 app.use('/zones', require('./zones.js'));
-app.use('/home', require('./home.js'));
 
 app.use(function(req,res) {
     res.status(404);
@@ -27,6 +26,10 @@ app.use(function(err, req, res, next) {
     console.error(err.stack);
     res.status(500);
     res.render('500');
+});
+
+app.get('/', function(req, res) {
+    res.render('home');
 });
 
 app.listen(app.get('port'), function() {
