@@ -3,7 +3,11 @@ module.exports = function() {
     var router = express.Router();
 
     function getClimbers(res, mysql, context, complete) {
-        mysql.pool.query("SELECT climbers.id, climbers.name, age, weight, height, ascents, zones.name as homezone FROM climbers LEFT JOIN zones ON home_zone_id = zones.id", function(error, results, fields) {
+        var sql = "SELECT climbers.id, climbers.name, age, weight, height, COUNT(climbers.id) as cAscents, zones.name as homezone FROM climbers " +
+                "LEFT JOIN zones ON home_zone_id = zones.id " +
+                "INNER JOIN ascents ON climbers.id = ascents.cid " +
+                "GROUP BY climbers.id";
+        mysql.pool.query(sql, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
                 res.end();
