@@ -12,15 +12,12 @@ app.set('view engine', 'handlebars');
 app.set('port', process.env.PORT || 8000);
 app.set('mysql', mysql);
 
+
 app.use('/climbers', require('./climbers.js'));
 app.use('/problems', require('./problems.js'));
 app.use('/logbook', require('./logbook.js'));
 app.use('/zones', require('./zones.js'));
 
-app.use(function(req,res) {
-    res.status(404);
-    res.render('404');
-});
 
 app.use(function(err, req, res, next) {
     console.error(err.stack);
@@ -28,7 +25,8 @@ app.use(function(err, req, res, next) {
     res.render('500');
 });
 
-app.get('/', function(req, res) {
+
+app.get('/', function(req, res){
     res.render('home');
 });
 
