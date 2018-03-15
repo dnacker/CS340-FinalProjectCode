@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    $("#climbers-link").addClass("active");
-});
-
 function deleteClimber(id) {
     var confirmDelete = confirm("Are you sure you want to delete this climber?");
     if (confirmDelete) {

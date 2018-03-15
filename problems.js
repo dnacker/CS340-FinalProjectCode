@@ -3,8 +3,10 @@ module.exports = function() {
     var router = express.Router();
 
     function getProblems(res, mysql, context, complete) {
-        var sql = "SELECT problems.id, problems.name, difficulty, ascents, zones.name AS zone FROM problems " + 
-                "INNER JOIN zones ON problems.zoneid = zones.id " + 
+        var sql = "SELECT problems.id, problems.name, difficulty, COUNT(ascents.cid) AS pAscents, zones.name AS zone FROM problems " + 
+                "INNER JOIN zones ON problems.zoneid = zones.id " +
+                "LEFT JOIN ascents ON problems.id = ascents.pid " +
+                "GROUP BY problems.id " + 
                 "ORDER BY zone, difficulty";
         mysql.pool.query(sql, function(error, results, fields) {
             if (error) {
@@ -18,8 +20,8 @@ module.exports = function() {
  
     function getProblemStyles(res, mysql, context, complete) {
         var sql = "SELECT problems.id, styles.name FROM problems " + 
-                    "INNER JOIN problem_styles ON problems.id = problem_styles.pid " + 
-                    "INNER JOIN styles ON problem_styles.sid = styles.id";
+                "INNER JOIN problem_styles ON problems.id = problem_styles.pid " + 
+                "INNER JOIN styles ON problem_styles.sid = styles.id";
         mysql.pool.query(sql, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
@@ -31,9 +33,9 @@ module.exports = function() {
     }
 
 
-    function getProblem(res, mysql, context, id, complete) {
-        var sql = "SELECT id, name, difficulty, ascents, zoneid FROM problems WHERE id = ?";
-        var inserts = [id];
+    function getProblem(res, mysql, context, pid, complete) {
+        var sql = "SELECT id, name, difficulty, zoneid FROM problems WHERE id = ?";
+        var inserts = [pid];
         mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
@@ -79,6 +81,24 @@ module.exports = function() {
         }
     }
 
+    function addProblemStyles(req, res, mysql, complete) {
+        var sql = "INSERT INTO problem_styles (pid, sid) VALUES ?";
+        var inserts = [];
+        for (var i = 0; i < req.body.styles.length; i++) {
+            var insert = [];
+            insert.push("SELECT LAST_INSERT_ID()");
+            insert.push(req.body.styles[i]);
+            inserts.push(insert);
+        }
+        sql = mysql.pool.query(sql, [inserts], function(error, results, fields) {
+            if (error) {
+                res.write(JSON.stringify(error));
+                res.end();
+            }
+            complete();
+        });
+    }
+
     router.get('/', function(req, res) {
         var callbackCount = 0;
         var context = {};
@@ -98,63 +118,33 @@ module.exports = function() {
     });
 
     router.post('/', function(req, res) {
-        //fix post
         callbackCount = 0;
         var mysql = req.app.get('mysql');
-        var sql1 = "INSERT INTO problems (name, difficulty, ascents, zoneid) VALUES (?, ?, ?, ?)";
-        var inserts1 = [req.body.name, req.body.difficulty, 0, req.body.zone];
-        sql1 = mysql.pool.query(sql1, inserts1, function(error, results, fields) {
+        var sql = "INSERT INTO problems (name, difficulty, zoneid) VALUES (?, ?, ?)";
+        var inserts = [req.body.name, req.body.difficulty, req.body.zone];
+        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
                 res.end();
-            } else {
-                var sql2 = "INSERT INTO problem_styles (pid, sid) VALUES ";
-                var value = "((SELECT MAX(problems.id) FROM problems)";
-                var values = "";
-                for (var i = 0; i < req.body.styles.length; i++) {
-                    values += value + ", " + req.body.styles[i] + ")";
-                    if (i != req.body.styles.length - 1) {
-                        values += ", ";
-                    }
-                }
-                sql2 += values;
-                sql2 = mysql.pool.query(sql2, function(error, results, fields) {
-                    if (error) {
-                        res.write(JSON.stringify(error));
-                        res.end();
-                    } else {
-                        var sql3 = "UPDATE zones SET zones.quantity = zones.quantity + 1 " +
-                                "WHERE zones.id = ?";
-                        var inserts3 = [req.body.zone];
-                        sql3 = mysql.pool.query(sql3, inserts3, function(error, results, fields) {
-                            if (error) {
-                                res.write(JSON.stringify(error));
-                                res.end();
-                            } else {
-                                complete();
-                            }
-                        });
-                        complete();
-                    }
-                });
             }
+            // addProblemStyles(req, res, mysql, complete);
             complete();
         });
         function complete() {
             callbackCount++;
-            if (callbackCount>= 3) {
+            if (callbackCount>= 1) {
                 res.redirect('/problems');
             }
         }
 
     });
 
-    router.get('/:id', function(req, res) {
+    router.get('/:pid', function(req, res) {
         callbackCount = 0;
         var context = {};
         context.jsscripts = ["updateproblem.js"];
         var mysql = req.app.get('mysql');
-        getProblem(res, mysql, context, req.params.id, complete);
+        getProblem(res, mysql, context, req.params.pid, complete);
         getZones(res, mysql, context, complete);
         getStyles(res, mysql, context, complete);
         getProblemStyles(res, mysql, context, complete);
@@ -169,11 +159,12 @@ module.exports = function() {
         }
     });
 
-    router.put('/:id', function(req, res) {
+    router.put('/:pid', function(req, res) {
         var mysql = req.app.get('mysql');
         var sql = "UPDATE problems SET name=?, difficulty=?, zoneid=? WHERE id=?";
-        var inserts = [req.body.name, req.body.difficulty, req.body.zoneid, req.params.id];
+        var inserts = [req.body.name, req.body.difficulty, req.body.zoneid, req.params.pid];
         //TODO: update from checkboxes so styles are updated
+
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 req.write(JSON.stringify(error));
@@ -185,10 +176,10 @@ module.exports = function() {
         });
     });
 
-    router.delete('/:id', function(req, res) {
+    router.delete('/:pid', function(req, res) {
         var mysql = req.app.get('mysql');
-        var sql = "CALL delete_problem(?)";
-        var inserts = [req.params.id];
+        var sql = "DELETE FROM problems WHERE id = ?";
+        var inserts = [req.params.pid];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));

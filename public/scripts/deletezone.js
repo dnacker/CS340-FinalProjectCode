@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    $("#zones-link").addClass("active");
-});
-
 function deleteZone(id) {
     var confirmDelete = confirm("Are you sure you want to delete this zone?");
     if (confirmDelete) {

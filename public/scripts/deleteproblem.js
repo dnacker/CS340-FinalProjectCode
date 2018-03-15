@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    $("#problems-link").addClass("active");
-});
-
 function deleteProblem(id) {
     var confirmDelete = confirm("Are you sure you want to delete this problem?");
     if (confirmDelete) {

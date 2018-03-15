@@ -4,7 +4,8 @@
         <th>Name</th>
         <th>Country</th>
         <th>State/Province</th>
-        <th>Quantity</th>
+        <th>Climbers</th>
+        <th>Problems</th>
     </thead>
     <tbody>
         {{#each zones}}
@@ -12,7 +13,8 @@
             <td>{{name}}</td>
             <td>{{country}}</td>
             <td>{{state}}</td>
-            <td>{{quantity}}</td>
+            <td>{{climberTotal}}</td>
+            <td>{{problemTotal}}</td>
             <td><a href="/zones/{{id}}">Update</a></td>
             <td><button onclick="deleteZone({{id}})">Delete</button></td>
         </tr>
@@ -26,3 +28,8 @@
     State: <input type="text" name="state"><br>
     <input type="submit" value="Submit">
 </form>
+<script>
+$(document).ready(function() {
+    $("#zones-link").addClass("active");
+});
+</script>

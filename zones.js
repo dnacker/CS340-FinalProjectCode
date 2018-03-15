@@ -3,9 +3,11 @@ module.exports = function() {
     var router = express.Router();
 
     function getProblems(res, mysql, zid, context, complete) {
-        var sql = "SELECT id, name, difficulty, ascents FROM problems " + 
-                "WHERE zoneid = ?"
-                "ORDER BY difficulty ASC";
+        var sql = "SELECT id, name, difficulty, COUNT(problems.id) AS problemTotal FROM problems " + 
+                "LEFT JOIN ascents ON problems.id = ascents.pid " +
+                "WHERE problems.zoneid = ? " + 
+                "GROUP BY problems.id " + 
+                "ORDER BY difficulty";
         var inserts = [zid];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
@@ -18,7 +20,7 @@ module.exports = function() {
     }
 
     function getZone(res, mysql, zid, context, complete) {
-        var sql = "SELECT id, name, country, state, quantity FROM zones WHERE id = ?";
+        var sql = "SELECT zones.id, zones.name, country, state FROM zones WHERE zones.id = ?";
         var inserts = [zid];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
@@ -31,7 +33,10 @@ module.exports = function() {
     }
 
     function getZones(res, mysql, context, complete) {
-        var sql = "SELECT id, name, country, state, quantity FROM zones";
+        var sql = "SELECT zones.id, zones.name, country, state, COUNT(DISTINCT climbers.id) AS climberTotal, COUNT(DISTINCT problems.id) AS problemTotal FROM zones " +
+                "LEFT JOIN climbers ON climbers.home_zone_id = zones.id " +
+                "LEFT JOIN problems ON problems.zoneid = zones.id " +
+                "GROUP BY zones.id";
         sql = mysql.pool.query(sql, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
@@ -56,22 +61,20 @@ module.exports = function() {
         var mysql = req.app.get('mysql');
         var context = {};
         context.jsscripts = ['updatezone.js', 'deleteproblem.js'];
-        
         var callbackCount = 0;
-        
         getProblems(res, mysql, req.params.zid, context, complete);
         getZone(res, mysql, req.params.zid, context, complete);
         function complete() {
             callbackCount++;
             if (callbackCount >= 2) {
-                res.render('zoneproblems', context);
+                res.render('update-zone', context);
             }
         }
     });
 
     router.post('/', function(req, res) {
         var mysql = req.app.get('mysql');
-        var sql = "INSERT INTO zones (name, country, state, quantity) VALUES (?, ?, ?, 0)";
+        var sql = "INSERT INTO zones (name, country, state) VALUES (?, ?, ?)";
         var inserts = [req.body.name, req.body.country, req.body.state];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
@@ -103,7 +106,7 @@ module.exports = function() {
 
     router.delete('/:zid', function(req, res) {
         var mysql = req.app.get('mysql');
-        var sql = "CALL delete_zone(?)";
+        var sql = "DELETE FROM zones WHERE id = ?";
         var inserts = [req.params.zid];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {

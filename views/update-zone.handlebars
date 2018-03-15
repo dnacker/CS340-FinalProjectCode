@@ -17,10 +17,15 @@
         <tr>
             <td>{{name}}</td>
             <td>{{difficulty}}</td>
-            <td>{{ascents}}</td>
+            <td>{{pAscents}}</td>
             <td><a href="/problems/{{id}}">Update</a></td>
             <td><button onclick="deleteProblem({{id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
 </table>
+<script>
+$(document).ready(function() {
+    $("#zones-link").addClass("active");
+});
+</script>
