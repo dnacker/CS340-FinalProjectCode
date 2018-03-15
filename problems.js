@@ -81,16 +81,17 @@ module.exports = function() {
         }
     }
 
-    function addProblemStyles(req, res, mysql, complete) {
-        var sql = "INSERT INTO problem_styles (pid, sid) VALUES ?";
+    function addProblemStyles(styleArr, res, mysql, complete) {
+        var sql = "INSERT INTO problem_styles (pid, sid) VALUES ";
         var inserts = [];
-        for (var i = 0; i < req.body.styles.length; i++) {
-            var insert = [];
-            insert.push("SELECT LAST_INSERT_ID()");
-            insert.push(req.body.styles[i]);
-            inserts.push(insert);
+        for (var i = 0; i < styleArr.length; i++) {
+            sql += "((SELECT MAX(problems.id) FROM problems), ?)";
+            inserts.push(styleArr[i]);
+            if (i != styleArr.length - 1) {
+                sql += ", ";
+            }
         }
-        sql = mysql.pool.query(sql, [inserts], function(error, results, fields) {
+        sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
                 res.end();
@@ -98,6 +99,7 @@ module.exports = function() {
             complete();
         });
     }
+
 
     router.get('/', function(req, res) {
         var callbackCount = 0;
@@ -118,21 +120,24 @@ module.exports = function() {
     });
 
     router.post('/', function(req, res) {
-        callbackCount = 0;
+        var callbackCount = 0;
         var mysql = req.app.get('mysql');
         var sql = "INSERT INTO problems (name, difficulty, zoneid) VALUES (?, ?, ?)";
         var inserts = [req.body.name, req.body.difficulty, req.body.zone];
+        var styleArr = req.body.styles.slice();
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
                 res.end();
             }
-            // addProblemStyles(req, res, mysql, complete);
+            addProblemStyles(styleArr, res, mysql, complete);
             complete();
         });
+
+        
         function complete() {
             callbackCount++;
-            if (callbackCount>= 1) {
+            if (callbackCount>= 2) {
                 res.redirect('/problems');
             }
         }
