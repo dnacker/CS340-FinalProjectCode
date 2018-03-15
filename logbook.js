@@ -103,7 +103,7 @@ module.exports = function() {
         }
 
         function addAscent(res, cid, pid, mysql, complete) {
-            var sql = "CALL add_ascent(?, ?)";
+            var sql = "INSERT INTO ascents (cid, pid) VALUES (?, ?)";
             var inserts = [cid, pid];
             mysql.pool.query(sql, inserts, function(error, results, fields) {
                 if (error) {
@@ -118,7 +118,7 @@ module.exports = function() {
     
     router.delete('/:cid/:pid', function(req, res) {
         var mysql = req.app.get('mysql');
-        var sql = "CALL delete_ascent(?, ?)";
+        var sql = "DELETE FROM ascents WHERE cid = ? AND pid = ?";
         var inserts = [req.params.cid, req.params.pid];
         sql = mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
