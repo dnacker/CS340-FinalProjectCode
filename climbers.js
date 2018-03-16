@@ -41,6 +41,19 @@ module.exports = function() {
         });
     }
 
+    function buildZonesContext(context) {
+        var zones = context.zones;
+        if (!Array.isArray(zones)) {
+            zones = [zones];
+        }
+        for (var i = 0; i < zones.length; i++) {
+            zones[i].selected = false;
+            if (zones[i].id == context.climber.home_zone_id) {
+                zones[i].selected = true;
+            }
+        }
+    }
+
     router.get('/', function(req, res) {
         var callbackCount = 0;
         var context = {};
@@ -80,6 +93,8 @@ module.exports = function() {
         function complete() {
             callbackCount++;
             if (callbackCount >= 2) {
+                buildZonesContext(context);
+                console.log(context);
                 res.render('update-climber', context);
             }
         }
@@ -114,7 +129,5 @@ module.exports = function() {
             }
         });
     });
-
-
     return router;
 }();

@@ -6,7 +6,7 @@
     Weight (kg): <input type="number" name="weight" value="{{climber.weight}}"><br>
     Home Zone: <select name="homezone">
         {{#each zones}}
-        <option value="{{id}}">{{name}}</option>
+        <option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>
         {{/each}}
     </select><br>
 </form>
