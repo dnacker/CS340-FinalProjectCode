@@ -4,11 +4,11 @@
     Difficulty: <input type="number" name="difficulty" value="{{problem.difficulty}}"><br>
     Styles: 
     {{#each styles}}
-    {{name}}: <input type="checkbox" value="{{id}}" name="styles"><br>
+    {{name}}: <input type="checkbox" value="{{id}}" name="styles" {{#if checked}}checked{{/if}}><br>
     {{/each}}
     Zone: <select name="zoneid">
         {{#each zones}}
-        <option value="{{id}}">{{name}}</option>
+        <option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>
         {{/each}}
     </select><br>
 </form>
