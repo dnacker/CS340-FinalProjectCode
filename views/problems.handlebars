@@ -27,8 +27,8 @@
 </table>
 <h2>Add a problem:</h2>
 <form id="addproblem" action="/problems" method="post">
-    Name: <input type="text" name="name"><br>
-    Difficulty: <input type="number" name="difficulty"><br>
+    Name: <input type="text" name="name" required><br>
+    Difficulty: <input type="number" name="difficulty" required><br>
     Styles: 
     {{#each styles}}
     {{name}}: <input type="checkbox" value="{{id}}" name="styles"><br>

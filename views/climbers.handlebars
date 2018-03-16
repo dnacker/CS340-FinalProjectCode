@@ -26,10 +26,10 @@
 </table>
 <h2>Add a climber:</h2>
 <form id="addclimber" action="/climbers" method="post">
-    Name: <input type="text" name="name"><br>
-    Age: <input type="number" name="age"><br>
-    Height (cm): <input type="number" name="height"><br>
-    Weight (kg): <input type="number" name="weight"><br>
+    Name: <input type="text" name="name" required><br>
+    Age: <input type="number" name="age" required><br>
+    Height (cm): <input type="number" name="height" required><br>
+    Weight (kg): <input type="number" name="weight" required><br>
     Home Zone: <select name="homezone">
         {{#each zones}}
         <option value="{{id}}">{{name}}</option>

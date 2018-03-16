@@ -1,9 +1,9 @@
 <h1>Update {{climber.name}}</h1>
 <form id="update-climber" action="/climbers" method="post">
-    Name: <input type="text" name="name" value="{{climber.name}}"><br>
-    Age: <input type="number" name="age" value="{{climber.age}}"><br>
-    Height (cm): <input type="number" name="height" value="{{climber.height}}"><br>
-    Weight (kg): <input type="number" name="weight" value="{{climber.weight}}"><br>
+    Name: <input type="text" name="name" value="{{climber.name}}" required><br>
+    Age: <input type="number" name="age" value="{{climber.age}}" required><br>
+    Height (cm): <input type="number" name="height" value="{{climber.height}}" required><br>
+    Weight (kg): <input type="number" name="weight" value="{{climber.weight}}" required><br>
     Home Zone: <select name="homezone">
         {{#each zones}}
         <option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>
