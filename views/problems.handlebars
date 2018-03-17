@@ -52,5 +52,12 @@
 <script>
 $(document).ready(function() {
     $("#problems-link").addClass("active");
+    var url = window.location.href;
+    if (url.indexOf('styles') > 0) {
+        var styleId = url.substring(url.indexOf('styles') + 7);
+        var styleFilter = document.getElementById('styleFilter');
+        console.log(styleId);
+        styleFilter.value = styleId;
+    }
 });
 </script>

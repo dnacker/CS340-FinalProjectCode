@@ -43,11 +43,14 @@ module.exports = function() {
         });
     }
 
-    function getZoneProblems(res, mysql, context, zid, complete) {
+    function getZoneProblems(zid, cid, res, mysql, context, complete) {
         var sql = "SELECT problems.id, problems.name, problems.difficulty, zones.name as zone FROM problems " + 
                     "INNER JOIN zones ON problems.zoneid = zones.id " + 
-                    "WHERE zones.id = ? ORDER BY problems.difficulty";
-        var inserts = [zid];
+                    "WHERE zones.id = ? " + 
+                    "AND problems.id NOT IN " +
+                    "(SELECT pid FROM ascents WHERE cid = ?)"
+                    "ORDER BY problems.difficulty";
+        var inserts = [zid, cid];
         mysql.pool.query(sql, inserts, function(error, results, fields) {
             if (error) {
                 res.write(JSON.stringify(error));
@@ -68,8 +71,8 @@ module.exports = function() {
         getZones(res, mysql, context, complete);
         getClimberProblems(res, mysql, context, req.params.id, complete);
         if (req.url.indexOf("?zone=") > 0) {
-            var zoneid = parseInt(req.url.substring(req.url.indexOf("?zone=") + 6));
-            getZoneProblems(res, mysql, context, zoneid, complete);
+            var zid = req.url.substring(req.url.indexOf("?zone=") + 6);
+            getZoneProblems(zid, req.params.id, res, mysql, context, complete);
         } else {
             complete();
         }
@@ -86,34 +89,25 @@ module.exports = function() {
         var mysql = req.app.get('mysql');
         var callbackCount = 0;
         if (!Array.isArray(req.body.zoneproblems)) {
-            var arr = [];
-            arr.push(req.body.zoneproblems);
-            req.body.zoneproblems = arr;
+            req.body.zoneproblems = [req.body.zoneproblems];
         }
-        
+        var inserts = [];
+        console.log(req.body.zoneproblems);
         for (var i = 0; i < req.body.zoneproblems.length; i++) {
-            addAscent(res, req.params.id, req.body.zoneproblems[i], mysql, complete);
+            var insert = [];
+            insert.push(req.params.id);
+            insert.push(req.body.zoneproblems[i]);
+            inserts.push(insert);
         }
-
-        function complete() {
-            callbackCount++;
-            if (callbackCount >= req.body.zoneproblems.length) {
+        var sql = "INSERT INTO ascents (cid, pid) VALUES ?";
+        mysql.pool.query(sql, [inserts], function(error, results, fields) {
+            if (error) {
+                res.write(JSON.stringify(error));
+                res.end();
+            } else {
                 res.redirect('/logbook/' + req.params.id);
             }
-        }
-
-        function addAscent(res, cid, pid, mysql, complete) {
-            var sql = "INSERT INTO ascents (cid, pid) VALUES (?, ?)";
-            var inserts = [cid, pid];
-            mysql.pool.query(sql, inserts, function(error, results, fields) {
-                if (error) {
-                    res.write(JSON.stringify(error));
-                    res.end();
-                } else {
-                    complete();
-                }
-            });
-        }
+        });     
     });
     
     router.delete('/:cid/:pid', function(req, res) {
