@@ -19,7 +19,7 @@
     Log Ascent
 </h2>
 <form id="display-problems" action="/logbook/{{climber.id}}/" method="GET">
-    Zone: <select name="zone">
+    Zone: <select id="zone-select" name="zone">
     {{#each zones}}
     <option value="{{id}}">{{name}}</option>
     {{/each}}
@@ -47,5 +47,11 @@
 <script>
 $(document).ready(function() {
     $("#climbers-link").addClass("active");
+    var url = window.location.href;
+    if (url.indexOf("?zone=") > 0) {
+        var zid = url.substring(url.indexOf("?zone=") + 6);
+        var zoneSelect = document.getElementById("zone-select");
+        zoneSelect.value = zid;
+    }
 });
 </script>
