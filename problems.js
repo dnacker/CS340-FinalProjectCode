@@ -17,6 +17,25 @@ module.exports = function() {
             complete();
         });
     }
+
+    function getProblemsFilterByStyle(sid, res, mysql, context, complete) {
+        var sql = "SELECT problems.id, problems.name, difficulty, COUNT(ascents.cid) AS pAscents, zones.name AS zone, problem_styles.sid FROM problems " + 
+                "INNER JOIN zones ON problems.zoneid = zones.id " +
+                "LEFT JOIN problem_styles ON problems.id = problem_styles.pid " + 
+                "LEFT JOIN ascents ON problems.id = ascents.pid " +
+                "WHERE problem_styles.sid = ? " +
+                "GROUP BY problems.id " + 
+                "ORDER BY zone, difficulty";
+        var inserts = [sid];
+        mysql.pool.query(sql, inserts, function(error, results, fields) {
+            if (error) {
+                res.write(JSON.stringify(error));
+                res.end();
+            }
+            context.problems = results;
+            complete();
+        });
+    }
  
     function getProblemsStyles(res, mysql, context, complete) {
         var sql = "SELECT problems.id, styles.name FROM problems " + 
@@ -263,6 +282,23 @@ module.exports = function() {
         });
     });
 
+    router.get('/styles/:sid', function(req, res) {
+        var mysql = req.app.get('mysql');
+        var context = {};
+        context.jsscripts = ["deleteproblem.js"];
+        var callbackCount = 0;
+        getZones(res, mysql, context, complete);
+        getProblemsFilterByStyle(req.params.sid, res, mysql, context, complete);
+        getProblemsStyles(res, mysql, context, complete);
+        getStyles(res, mysql, context, complete);
+        function complete() {
+            callbackCount++;
+            if (callbackCount >= 4) {
+                associateStylesToProblems(context);
+                res.render('problems', context);
+            }
+        }
+    });
 
     return router;
 }();

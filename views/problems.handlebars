@@ -1,4 +1,13 @@
 <h1>Problems</h1>
+
+<h3>Filter by style</h3>
+<select id="styleFilter" onchange="filterStyles()">
+    <option value="NULL"></option>
+    {{#each styles}}
+    <option value="{{id}}">{{name}}</option>
+    {{/each}}
+</select>
+<button onclick="reset()">Reset styles</button>
 <table>
     <thead>
         <th>Name</th>
