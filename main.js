@@ -27,7 +27,9 @@ app.use(function(err, req, res, next) {
 
 
 app.get('/', function(req, res){
-    res.render('home');
+    var context = {};
+    context.jsscripts = ['googleSignIn.js'];
+    res.render('home', context);
 });
 
 app.listen(app.get('port'), function() {
